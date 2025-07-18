@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Malla Curricular - Terapia Ocupacional</title>
   <style>
     body {
@@ -58,7 +58,6 @@
       cursor: pointer;
       transition: background-color 0.3s;
       font-size: 0.95em;
-      position: relative; /* Para tooltip */
     }
     .subject.approved {
       background-color: #a8dadc;
@@ -68,7 +67,6 @@
       background-color: #f1f1f1;
       color: #aaa;
       cursor: not-allowed;
-      position: relative;
     }
     .subject.locked:hover::after {
       content: attr(data-tooltip);
@@ -82,29 +80,11 @@
       font-size: 12px;
       white-space: pre-line;
       z-index: 2;
-      max-width: 200px;
-      width: max-content;
-    }
-    #reset {
-      display: block;
-      margin: 20px auto;
-      padding: 8px 16px;
-      font-size: 1em;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      background-color: #2a4d3b;
-      color: white;
-      transition: background-color 0.3s;
-    }
-    #reset:hover {
-      background-color: #1f3a2a;
     }
   </style>
 </head>
 <body>
   <h1>Malla Curricular Interactiva - Terapia Ocupacional</h1>
-  <button id="reset">Reiniciar materias aprobadas</button>
   <div class="grid" id="curriculum"></div>
 
   <script>
@@ -114,6 +94,60 @@
       'Año 3': ['V', 'VI'],
       'Año 4': ['VII', 'VIII'],
       'Año 5': ['IX', 'X']
+    };
+
+    const approved = JSON.parse(localStorage.getItem('approvedSubjects') || '[]');
+
+    const isUnlocked = (subject) => {
+      if (!subject.prereq) return true;
+      return subject.prereq.every(code => approved.includes(code));
+    };
+
+    const renderCurriculum = () => {
+      const container = document.getElementById('curriculum');
+      container.innerHTML = '';
+
+      for (const [year, semesters] of Object.entries(subjectsByYear)) {
+        const yearDiv = document.createElement('div');
+        yearDiv.className = 'year';
+        const yearTitle = document.createElement('h2');
+        yearTitle.textContent = year;
+        yearDiv.appendChild(yearTitle);
+
+        semesters.forEach(sem => {
+          const semesterDiv = document.createElement('div');
+          semesterDiv.className = 'semester';
+          semesterDiv.innerHTML = `<h3>Semestre ${sem}</h3>`;
+
+          subjects.filter(s => s.semester === sem).forEach(subj => {
+            const el = document.createElement('div');
+            el.className = 'subject';
+            el.textContent = `${subj.name}`;
+
+            if (approved.includes(subj.code)) {
+              el.classList.add('approved');
+            } else if (!isUnlocked(subj)) {
+              el.classList.add('locked');
+              el.setAttribute('data-tooltip', 'Requiere:\n' + subj.prereq.map(c => {
+                const req = subjects.find(s => s.code === c);
+                return req ? req.name : c;
+              }).join('\n'));
+            } else {
+              el.addEventListener('click', () => {
+                approved.push(subj.code);
+                localStorage.setItem('approvedSubjects', JSON.stringify(approved));
+                renderCurriculum();
+              });
+            }
+
+            semesterDiv.appendChild(el);
+          });
+
+          yearDiv.appendChild(semesterDiv);
+        });
+
+        container.appendChild(yearDiv);
+      }
     };
 
     const subjects = [
@@ -130,7 +164,7 @@
       { code: 'FGL-001', name: 'Cultura y Valores', semester: 'II' },
       { code: 'ENF-150', name: 'Salud y Sociedad', semester: 'II' },
       { code: 'ENF-151', name: 'Atención Básica de Urgencia', semester: 'II' },
-      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] },
+      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] }
       { code: 'TOC-006', name: 'Psicología Social y del Trabajo', semester: 'III' },
       { code: 'TOC-084', name: 'Fundamentos del Movimiento Humano', semester: 'III', prereq: ['MAT-016'] },
       { code: 'TOC-085', name: 'Anatomía y Fisiología de Sistemas', semester: 'III' },
@@ -176,98 +210,6 @@
       { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107'] },
       { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X' }
     ];
-
-    const approved = JSON.parse(localStorage.getItem('approvedSubjects') || '[]');
-
-    // Códigos de los internados profesionales en orden
-    const internadosOrder = ['TOC-114', 'TOC-115', 'TOC-117', 'TOC-118'];
-
-    // Todos los códigos de materias de los semestres I a VIII (para requerimiento de internados)
-    const allRequiredSubjectsForInternados = subjects
-      .filter(s => ['I','II','III','IV','V','VI','VII','VIII'].includes(s.semester))
-      .map(s => s.code);
-
-    const isUnlocked = (subject) => {
-      // Regla especial para internados profesionales
-      if (internadosOrder.includes(subject.code)) {
-        // Verificar que todos los ramos desde I a VIII estén aprobados
-        const baseReqMet = allRequiredSubjectsForInternados.every(code => approved.includes(code));
-        if (!baseReqMet) return false;
-
-        // Verificar que el internado anterior esté aprobado (excepto el primero)
-        const index = internadosOrder.indexOf(subject.code);
-        if (index > 0) {
-          const prevInternado = internadosOrder[index - 1];
-          if (!approved.includes(prevInternado)) return false;
-        }
-        return true;
-      }
-
-      // Para las demás materias, verifica prerequisitos normales
-      if (!subject.prereq) return true;
-      return subject.prereq.every(code => approved.includes(code));
-    };
-
-    const renderCurriculum = () => {
-      const container = document.getElementById('curriculum');
-      container.innerHTML = '';
-
-      for (const [year, semesters] of Object.entries(subjectsByYear)) {
-        const yearDiv = document.createElement('div');
-        yearDiv.className = 'year';
-        const yearTitle = document.createElement('h2');
-        yearTitle.textContent = year;
-        yearDiv.appendChild(yearTitle);
-
-        semesters.forEach(sem => {
-          const semesterDiv = document.createElement('div');
-          semesterDiv.className = 'semester';
-          semesterDiv.innerHTML = <h3>Semestre ${sem}</h3>;
-
-          subjects.filter(s => s.semester === sem).forEach(subj => {
-            const el = document.createElement('div');
-            el.className = 'subject';
-            el.textContent = ${subj.name};
-
-            if (approved.includes(subj.code)) {
-              el.classList.add('approved');
-            } else if (!isUnlocked(subj)) {
-              el.classList.add('locked');
-              el.setAttribute('data-tooltip', 'Requiere:\n' + (internadosOrder.includes(subj.code) 
-                ? Todos los ramos desde I a VIII\n +
-                  (internadosOrder[internadosOrder.indexOf(subj.code) - 1] ? 
-                    Aprobación de: ${subjects.find(s => s.code === internadosOrder[internadosOrder.indexOf(subj.code) -1]).name}
-                    : '') 
-                : (subj.prereq ? subj.prereq.map(c => {
-                    const req = subjects.find(s => s.code === c);
-                    return req ? req.name : c;
-                  }).join('\n') : '')
-                ));
-            } else {
-              el.addEventListener('click', () => {
-                if (!approved.includes(subj.code)) {
-                  approved.push(subj.code);
-                  localStorage.setItem('approvedSubjects', JSON.stringify(approved));
-                  renderCurriculum();
-                }
-              });
-            }
-
-            semesterDiv.appendChild(el);
-          });
-
-          yearDiv.appendChild(semesterDiv);
-        });
-
-        container.appendChild(yearDiv);
-      }
-    };
-
-    document.getElementById('reset').addEventListener('click', () => {
-      localStorage.removeItem('approvedSubjects');
-      approved.length = 0; // Vaciar arreglo
-      renderCurriculum();
-    });
 
     renderCurriculum();
   </script>
