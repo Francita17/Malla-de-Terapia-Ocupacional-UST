@@ -104,6 +104,10 @@
     };
 
     const renderCurriculum = () => {
+      subjects.forEach(subj => {
+        const storedGrade = localStorage.getItem(`grade_${subj.code}`);
+        if (storedGrade) subj.grade = storedGrade;
+      });
       const container = document.getElementById('curriculum');
       container.innerHTML = '';
 
@@ -122,7 +126,7 @@
           subjects.filter(s => s.semester === sem).forEach(subj => {
             const el = document.createElement('div');
             el.className = 'subject';
-            el.textContent = `${subj.name}`;
+            el.textContent = `${subj.name}${subj.grade ? ' - Nota: ' + subj.grade : ''}`;
 
             if (approved.includes(subj.code)) {
               el.classList.add('approved');
@@ -134,9 +138,13 @@
               }).join('\n'));
             } else {
               el.addEventListener('click', () => {
-                approved.push(subj.code);
-                localStorage.setItem('approvedSubjects', JSON.stringify(approved));
-                renderCurriculum();
+                const grade = prompt('Ingrese su nota final para esta asignatura:');
+                if (grade !== null && grade.trim() !== '') {
+                  approved.push(subj.code);
+                  localStorage.setItem(`grade_${subj.code}`, grade.trim());
+                  localStorage.setItem('approvedSubjects', JSON.stringify(approved));
+                  renderCurriculum();
+                }
               });
             }
 
@@ -164,7 +172,7 @@
       { code: 'FGL-001', name: 'Cultura y Valores', semester: 'II' },
       { code: 'ENF-150', name: 'Salud y Sociedad', semester: 'II' },
       { code: 'ENF-151', name: 'Atención Básica de Urgencia', semester: 'II' },
-      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] }
+      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] },
       { code: 'TOC-006', name: 'Psicología Social y del Trabajo', semester: 'III' },
       { code: 'TOC-084', name: 'Fundamentos del Movimiento Humano', semester: 'III', prereq: ['MAT-016'] },
       { code: 'TOC-085', name: 'Anatomía y Fisiología de Sistemas', semester: 'III' },
