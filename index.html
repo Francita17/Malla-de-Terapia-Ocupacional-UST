@@ -105,12 +105,16 @@
     };
 
     function resetProgress() {
-      if (confirm('¿Estás seguro de que quieres reiniciar tu progreso?')) {
-        localStorage.clear();
-        location.reload();
+  if (confirm('¿Estás seguro de que quieres reiniciar tu progreso?')) {
+    localStorage.removeItem('approvedSubjects');
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('grade_')) {
+        localStorage.removeItem(key);
       }
-    }
-
+    });
+    location.reload();
+  }
+}
     $1
       subjects.forEach(subj => {
         const storedGrade = localStorage.getItem(`grade_${subj.code}`);
@@ -137,15 +141,17 @@
             el.textContent = `${subj.name}${subj.grade ? ' - Nota: ' + subj.grade : ''}`;
 
             if (approved.includes(subj.code)) {
-              el.classList.add('approved');
-              el.addEventListener('click', () => {
-                const newGrade = prompt('Editar nota para esta asignatura:', subj.grade || '');
-                if (newGrade !== null && newGrade.trim() !== '') {
-                  localStorage.setItem(`grade_${subj.code}`, newGrade.trim());
-                  subj.grade = newGrade.trim();
-                  renderCurriculum();
-                }
-              });
+  el.classList.add('approved');
+  el.addEventListener('click', () => {
+    const currentGrade = localStorage.getItem(`grade_${subj.code}`) || '';
+    const newGrade = prompt('Editar nota para esta asignatura:', currentGrade);
+    if (newGrade !== null && newGrade.trim() !== '') {
+      localStorage.setItem(`grade_${subj.code}`, newGrade.trim());
+      subj.grade = newGrade.trim();
+      renderCurriculum();
+    }
+  });
+}
             } else if (!isUnlocked(subj)) {
               el.classList.add('locked');
               el.setAttribute('data-tooltip', 'Requiere:\n' + subj.prereq.map(c => {
