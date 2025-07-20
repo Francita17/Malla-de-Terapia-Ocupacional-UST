@@ -305,11 +305,10 @@
                   delete grades[subject.code];
                 } else {
                   // Identificar si es un hito (I o II)
-                  const esHito = ['TOC-087', 'TOC-107'].includes(subject.code);
-
-                  if (esHito) {
+                  const hitos = ['TOC-087', 'TOC-107'];
+                  if (hitos.includes(subject.code)) {
                     let estado = prompt(`Ingresa el estado de "${subject.name}": escribe "APR" para aprobado o "REP" para reprobado.`);
-                    if (estado === null) return;
+                    if (estado === null) return; // si cancela, salir
                     estado = estado.trim().toUpperCase();
                     if (estado === 'APR') {
                       approved.add(subject.code);
