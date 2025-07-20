@@ -191,11 +191,11 @@
       { code: 'TOC-111', name: 'Órtesis', semester: 'VIII', prereq: ['TOC-105'] },
       { code: 'TOC-EL3', name: 'Electivo III', semester: 'VIII', prereq: [] },
       { code: 'TOC-113', name: 'Metodología y Diseño de Investigación', semester: 'VIII', prereq: ['TOC-106'] },
-      { code: 'TOC-114', name: 'Internado Profesional I', semester: 'IX', prereq: [] },
-      { code: 'TOC-115', name: 'Internado Profesional II', semester: 'IX', prereq: ['TOC-107'] },
+      { code: 'TOC-114', name: 'Internado Profesional I', semester: 'IX', prereq: ['TOC-107'] },
+      { code: 'TOC-115', name: 'Internado Profesional II', semester: 'IX', prereq: ['TOC-107','TOC-114'] },
       { code: 'TOC-116', name: 'Seminario de Investigación', semester: 'IX', prereq: ['TOC-113'] },
-      { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107'] },
-      { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: [] }
+      { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107','TOC-115'] },
+      { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: ['TOC-107','TOC-117'] }
     ];
 
     const approved = new Set(JSON.parse(localStorage.getItem('approved') || '[]'));
