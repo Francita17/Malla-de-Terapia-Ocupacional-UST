@@ -295,19 +295,6 @@
                 if (approved.has(subject.code)) {
                   approved.delete(subject.code);
                   delete grades[subject.code];
-                } else {
-                  const hitos = ['TOC-087', 'TOC-107'];
-                  if (hitos.includes(subject.code)) {
-                    let estado = prompt(`Ingresa el estado de "${subject.name}": escribe "APR" para aprobado o "REP" para reprobado.`);
-                    if (estado === null) return;
-                    estado = estado.trim().toUpperCase();
-                    if (estado === 'APR') {
-                      approved.add(subject.code);
-                      grades[subject.code] = 'APR';
-                    } else {
-                      alert('El hito no se ha aprobado. Solo se aprueba con "APR".');
-                      return;
-                    }
                   } else {
                     let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
                     if (nota === null || nota.trim() === '') return;
