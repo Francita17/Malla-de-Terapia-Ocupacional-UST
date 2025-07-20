@@ -147,14 +147,12 @@
 </head>
 <body>
   <img src="Banner.png" alt="Malla Curricular - Terapia Ocupacional" style="display: block; margin: 0 auto 30px; max-width: 100%; height: auto;" />
-  
   <div class="progress-container">
     <div>Progreso académico: <span id="progress-text">0%</span></div>
     <div class="progress-bar">
       <div class="progress-fill" id="progress-fill">0%</div>
     </div>
   </div>
-  
   <div class="curriculum" id="curriculum"></div>
   <button onclick="resetProgress()">Reiniciar Progreso</button>
 
@@ -304,20 +302,40 @@
                   approved.delete(subject.code);
                   delete grades[subject.code];
                 } else {
-                  let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
-                  if (nota === null || nota.trim() === '') return;
-                  nota = nota.replace(',', '.');
-                  const parsed = parseFloat(nota);
-                  if (isNaN(parsed) || parsed < 4.0) {
-                    alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
-                    return;
+                  const hitos = ['TOC-087', 'TOC-107'];
+                  if (hitos.includes(subject.code)) {
+                    let estado = prompt(`Ingresa el estado de "${subject.name}": escribe "APR" para aprobado o "REP" para reprobado.`);
+                    if (estado === null) return; // si cancela, salir
+                    estado = estado.trim().toUpperCase();
+
+                    if (estado === 'APR') {
+                      approved.add(subject.code);
+                      grades[subject.code] = 'APR';
+                    } else if (estado === 'REP') {
+                      alert('El hito ha quedado como Reprobado (no aprobado).');
+                      return;
+                    } else {
+                      alert('Solo puedes escribir "APR" o "REP".');
+                      return;
+                    }
+                  } else {
+                    let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
+                    if (nota === null || nota.trim() === '') return;
+                    nota = nota.replace(',', '.');
+                    const parsed = parseFloat(nota);
+                    if (isNaN(parsed) || parsed < 4.0) {
+                      alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
+                      return;
+                    }
+                    approved.add(subject.code);
+                    grades[subject.code] = parsed.toFixed(1);
                   }
-                  approved.add(subject.code);
-                  grades[subject.code] = parsed.toFixed(1);
                 }
+
                 localStorage.setItem('approved', JSON.stringify([...approved]));
                 localStorage.setItem('grades', JSON.stringify(grades));
                 renderCurriculum();
+                updateProgress();
               };
 
               semDiv.appendChild(div);
@@ -328,23 +346,23 @@
 
         container.appendChild(yearDiv);
       }
-
-      updateProgress();  // <--- Aquí se actualiza la barra de progreso correctamente
     }
 
     function updateProgress() {
       const totalSubjects = subjects.length;
-      const approvedCount = approved.size;
-      const progress = Math.round((approvedCount / totalSubjects) * 100);
+      const approvedSubjects = approved.size;
+      const percent = totalSubjects ? Math.round((approvedSubjects / totalSubjects) * 100) : 0;
+
       const progressFill = document.getElementById('progress-fill');
       const progressText = document.getElementById('progress-text');
-      progressFill.style.width = progress + '%';
-      progressFill.textContent = progress + '%';
-      progressText.textContent = progress + '%';
+
+      progressFill.style.width = percent + '%';
+      progressFill.textContent = percent + '%';
+      progressText.textContent = percent + '%';
     }
 
     function resetProgress() {
-      if (confirm('¿Seguro que quieres reiniciar el progreso? Se eliminarán todas las asignaturas aprobadas y notas.')) {
+      if (confirm('¿Quieres reiniciar el progreso? Se eliminarán todas las asignaturas aprobadas y notas.')) {
         approved.clear();
         for (const key in grades) {
           delete grades[key];
@@ -352,11 +370,13 @@
         localStorage.removeItem('approved');
         localStorage.removeItem('grades');
         renderCurriculum();
+        updateProgress();
       }
     }
 
+    // Render inicial
     renderCurriculum();
+    updateProgress();
   </script>
 </body>
 </html>
-
