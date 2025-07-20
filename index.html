@@ -209,6 +209,16 @@
       return subject.prereq.every(code => approved.has(code));
     }
 
+    // Validar que todos los ramos hasta cierto semestre están aprobados
+    function allSemestersApproved(uptoSemester) {
+      const allowedSemesters = ['I','II','III','IV','V','VI','VII','VIII'];
+      const semestersToCheck = allowedSemesters.slice(0, allowedSemesters.indexOf(uptoSemester) + 1);
+
+      const subjectsToCheck = subjects.filter(s => semestersToCheck.includes(s.semester));
+
+      return subjectsToCheck.every(s => approved.has(s.code));
+    }
+
     function renderCurriculum() {
       const container = document.getElementById('curriculum');
       container.innerHTML = '';
@@ -227,7 +237,14 @@
             .filter(s => s.semester === sem)
             .forEach(subject => {
               const div = document.createElement('div');
-              const unlocked = meetsPrerequisites(subject);
+
+              // Para internados, además de prerrequisitos, se exige aprobar hasta VIII semestre
+              const unlocked = meetsPrerequisites(subject) && (
+                (subject.semester === 'IX' || subject.semester === 'X') 
+                  ? allSemestersApproved('VIII')
+                  : true
+              );
+
               div.className = 'subject';
 
               const gradeText = grades[subject.code] ? ` (${grades[subject.code]})` : '';
@@ -241,7 +258,13 @@
                   const found = subjects.find(s => s.code === p);
                   return found ? found.name : p;
                 });
-                div.title = 'Requiere: ' + names.join(', ');
+
+                let extraMsg = '';
+                if (subject.semester === 'IX' || subject.semester === 'X') {
+                  extraMsg = '\nAdemás, requiere aprobar todos los ramos hasta el VIII semestre.';
+                }
+
+                div.title = 'Requiere: ' + (names.length ? names.join(', ') : 'Prerrequisitos no cumplidos') + extraMsg;
               }
 
               div.onclick = () => {
@@ -251,7 +274,6 @@
                   approved.delete(subject.code);
                   delete grades[subject.code];
                 } else {
-                  approved.add(subject.code);
                   let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
                   if (nota === null || nota.trim() === '') return;
                   nota = nota.replace(',', '.');
