@@ -20,27 +20,29 @@
       font-size: 1.8em;
     }
     .progress-container {
-      width: 80%;
-      margin: 20px auto;
-      text-align: center;
-    }
-    .progress-bar {
-      width: 100%;
-      height: 25px;
-      background-color: #ccc;
-      border-radius: 15px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background-color: #4caf50;
-      width: 0%;
-      text-align: center;
-      color: white;
-      font-weight: bold;
-      line-height: 25px;
-      transition: width 0.5s ease-in-out;
-    }
+  width: 80%;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 25px;
+  background-color: #ccc;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #4caf50;
+  width: 0%;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  line-height: 25px;
+  transition: width 0.5s ease-in-out;
+}
     .curriculum {
       display: flex;
       flex-wrap: wrap;
@@ -148,11 +150,11 @@
 <body>
   <img src="Banner.png" alt="Malla Curricular - Terapia Ocupacional" style="display: block; margin: 0 auto 30px; max-width: 100%; height: auto;" />
   <div class="progress-container">
-    <div>Progreso académico: <span id="progress-text">0%</span></div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill">0%</div>
-    </div>
+  <div>Progreso académico: <span id="progress-text">0%</span></div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill">0%</div>
   </div>
+</div>
   <div class="curriculum" id="curriculum"></div>
   <button onclick="resetProgress()">Reiniciar Progreso</button>
 
@@ -237,10 +239,13 @@
       return subject.prereq.every(code => approved.has(code));
     }
 
+    // Validar que todos los ramos hasta cierto semestre están aprobados
     function allSemestersApproved(uptoSemester) {
       const allowedSemesters = ['I','II','III','IV','V','VI','VII','VIII'];
       const semestersToCheck = allowedSemesters.slice(0, allowedSemesters.indexOf(uptoSemester) + 1);
+
       const subjectsToCheck = subjects.filter(s => semestersToCheck.includes(s.semester));
+
       return subjectsToCheck.every(s => approved.has(s.code));
     }
 
@@ -263,8 +268,9 @@
             .forEach(subject => {
               const div = document.createElement('div');
 
+              // Para internados, además de prerrequisitos, se exige aprobar hasta VIII semestre
               const unlocked = meetsPrerequisites(subject) && (
-                (subject.semester === 'IX' || subject.semester === 'X')
+                (subject.semester === 'IX' || subject.semester === 'X') 
                   ? allSemestersApproved('VIII')
                   : true
               );
@@ -282,10 +288,12 @@
                   const found = subjects.find(s => s.code === p);
                   return found ? found.name : p;
                 });
+
                 let extraMsg = '';
                 if (subject.semester === 'IX' || subject.semester === 'X') {
                   extraMsg = '\nAdemás, requiere aprobar todos los ramos hasta el VIII semestre.';
                 }
+
                 div.title = 'Requiere: ' + (names.length ? names.join(', ') : 'Prerrequisitos no cumplidos') + extraMsg;
               }
 
@@ -295,20 +303,18 @@
                 if (approved.has(subject.code)) {
                   approved.delete(subject.code);
                   delete grades[subject.code];
-                  } else {
-                    let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
-                    if (nota === null || nota.trim() === '') return;
-                    nota = nota.replace(',', '.');
-                    const parsed = parseFloat(nota);
-                    if (isNaN(parsed) || parsed < 4.0) {
-                      alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
-                      return;
-                    }
-                    approved.add(subject.code);
-                    grades[subject.code] = parsed.toFixed(1);
+                } else {
+                  let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
+                  if (nota === null || nota.trim() === '') return;
+                  nota = nota.replace(',', '.');
+                  const parsed = parseFloat(nota);
+                  if (isNaN(parsed) || parsed < 4.0) {
+                    alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
+                    return;
                   }
+                  approved.add(subject.code);
+                  grades[subject.code] = parsed.toFixed(1);
                 }
-
                 localStorage.setItem('approved', JSON.stringify([...approved]));
                 localStorage.setItem('grades', JSON.stringify(grades));
                 renderCurriculum();
@@ -322,24 +328,22 @@
 
         container.appendChild(yearDiv);
       }
-
-      updateProgress();
+updateProgress();  // <--- Aquí se actualiza la barra de progreso correctamente
     }
 
     function updateProgress() {
       const totalSubjects = subjects.length;
       const approvedCount = approved.size;
-      const percent = Math.round((approvedCount / totalSubjects) * 100);
-      const progressText = document.getElementById('progress-text');
+      const progress = Math.round((approvedCount / totalSubjects) * 100);
       const progressFill = document.getElementById('progress-fill');
-
-      progressText.textContent = `${percent}%`;
-      progressFill.style.width = `${percent}%`;
-      progressFill.textContent = `${percent}%`;
+      const progressText = document.getElementById('progress-text');
+      progressFill.style.width = progress + '%';
+      progressFill.textContent = progress + '%';
+      progressText.textContent = progress + '%';
     }
 
     function resetProgress() {
-      if (confirm('¿Quieres reiniciar todo tu progreso académico? Esta acción no se puede deshacer.')) {
+      if (confirm('¿Seguro que quieres reiniciar el progreso? Se eliminarán todas las asignaturas aprobadas y notas.')) {
         approved.clear();
         for (const key in grades) {
           delete grades[key];
