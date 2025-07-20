@@ -328,36 +328,32 @@
 
         container.appendChild(yearDiv);
       }
+updateProgress();  // <--- Aquí se actualiza la barra de progreso correctamente
+    }
+
+    function updateProgress() {
+      const totalSubjects = subjects.length;
+      const approvedCount = approved.size;
+      const progress = Math.round((approvedCount / totalSubjects) * 100);
+      const progressFill = document.getElementById('progress-fill');
+      const progressText = document.getElementById('progress-text');
+      progressFill.style.width = progress + '%';
+      progressFill.textContent = progress + '%';
+      progressText.textContent = progress + '%';
     }
 
     function resetProgress() {
-      if (confirm('¿Deseas borrar tu progreso y notas?')) {
+      if (confirm('¿Seguro que quieres reiniciar el progreso? Se eliminarán todas las asignaturas aprobadas y notas.')) {
+        approved.clear();
+        for (const key in grades) {
+          delete grades[key];
+        }
         localStorage.removeItem('approved');
         localStorage.removeItem('grades');
-        approved.clear();
         renderCurriculum();
       }
     }
-function updateProgress() {
-  const total = subjects.length;
-  const completed = approved.size;
-  const percent = Math.round((completed / total) * 100);
 
-  const progressFill = document.getElementById('progress-fill');
-  const progressText = document.getElementById('progress-text');
-
-  progressFill.style.width = percent + '%';
-  progressFill.textContent = percent + '%';
-  progressText.textContent = percent + '%';
-
-  if (percent < 40) {
-    progressFill.style.backgroundColor = '#e53935'; // rojo
-  } else if (percent < 70) {
-    progressFill.style.backgroundColor = '#fbc02d'; // amarillo
-  } else {
-    progressFill.style.backgroundColor = '#4caf50'; // verde
-  }
-}
     renderCurriculum();
   </script>
 </body>
