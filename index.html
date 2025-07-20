@@ -312,7 +312,9 @@
                       approved.add(subject.code);
                       grades[subject.code] = 'APR';
                     } else if (estado === 'REP') {
+                      // No agregar aprobado ni nota
                       alert('El hito ha quedado como Reprobado (no aprobado).');
+                      // Solo salir sin guardar como aprobado
                       return;
                     } else {
                       alert('Solo puedes escribir "APR" o "REP".');
