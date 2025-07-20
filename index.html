@@ -184,75 +184,100 @@ const subjects = [
   { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107'] },
   { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: [] }
 ];
-    const approved = new Set(JSON.parse(localStorage.getItem('approved') || '[]'));
+const approved = new Set(JSON.parse(localStorage.getItem('approved') || '[]'));
+const grades = JSON.parse(localStorage.getItem('grades') || '{}');
 
-    function isApproved(code) {
-      return approved.has(code);
-    }
+function isApproved(code) {
+  return approved.has(code);
+}
 
-    function meetsPrerequisites(subject) {
-      return subject.prereq.every(code => approved.has(code));
-    }
+function meetsPrerequisites(subject) {
+  return subject.prereq.every(code => approved.has(code));
+}
 
-    function renderCurriculum() {
-      const container = document.getElementById('curriculum');
-      container.innerHTML = '';
+function renderCurriculum() {
+  const container = document.getElementById('curriculum');
+  container.innerHTML = '';
 
-      for (const [yearLabel, semesters] of Object.entries(curriculum)) {
-        const yearDiv = document.createElement('div');
-        yearDiv.className = 'year';
-        yearDiv.innerHTML = `<h2>${yearLabel}</h2>`;
+  for (const [yearLabel, semesters] of Object.entries(curriculum)) {
+    const yearDiv = document.createElement('div');
+    yearDiv.className = 'year';
+    yearDiv.innerHTML = `<h2>${yearLabel}</h2>`;
 
-        semesters.forEach(sem => {
-          const semDiv = document.createElement('div');
-          semDiv.className = 'semester';
-          semDiv.innerHTML = `<h3>Semestre ${sem}</h3>`;
+    semesters.forEach(sem => {
+      const semDiv = document.createElement('div');
+      semDiv.className = 'semester';
+      semDiv.innerHTML = `<h3>Semestre ${sem}</h3>`;
 
-          subjects
-            .filter(s => s.semester === sem)
-            .forEach(subject => {
-              const div = document.createElement('div');
-              const unlocked = meetsPrerequisites(subject);
-              div.className = 'subject';
+      subjects
+        .filter(s => s.semester === sem)
+        .forEach(subject => {
+          const div = document.createElement('div');
+          const unlocked = meetsPrerequisites(subject);
+          div.className = 'subject';
 
-              if (isApproved(subject.code)) {
-                div.classList.add('approved');
-              } else if (!unlocked) {
-                div.classList.add('locked');
-                const names = subject.prereq.map(p => {
-                  const found = subjects.find(s => s.code === p);
-                  return found ? found.name : p;
-                });
-                div.title = 'Requiere: ' + names.join(', ');
-              }
+          const gradeText = grades[subject.code] ? ` (${grades[subject.code]})` : '';
+          div.textContent = subject.name + gradeText;
 
-              div.textContent = subject.name;
-              div.onclick = () => {
-                if (!unlocked) return;
-                if (approved.has(subject.code)) approved.delete(subject.code);
-                else approved.add(subject.code);
-                localStorage.setItem('approved', JSON.stringify([...approved]));
-                renderCurriculum();
-              };
-              semDiv.appendChild(div);
+          if (isApproved(subject.code)) {
+            div.classList.add('approved');
+          } else if (!unlocked) {
+            div.classList.add('locked');
+            const names = subject.prereq.map(p => {
+              const found = subjects.find(s => s.code === p);
+              return found ? found.name : p;
             });
+            div.title = 'Requiere: ' + names.join(', ');
+          }
 
-          yearDiv.appendChild(semDiv);
+          div.onclick = () => {
+            if (!unlocked) return;
+
+            if (approved.has(subject.code)) {
+              // Si ya está aprobada: quitar aprobación y nota
+              approved.delete(subject.code);
+              delete grades[subject.code];
+            } else {
+              // Pedir nota
+              approved.add(subject.code);
+              let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
+              if (nota === null || nota.trim() === '') return; // Cancelado
+                nota = nota.replace(',', '.');
+                const parsed = parseFloat(nota);
+               if (isNaN(parsed) || parsed < 4.0) {
+               alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
+               return;
+           }
+
+    // Aprobar y guardar nota
+    approved.add(subject.code);
+    grades[subject.code] = parsed.toFixed(1);
+  }
+            // Guardar en localStorage
+            localStorage.setItem('approved', JSON.stringify([...approved]));
+            localStorage.setItem('grades', JSON.stringify(grades));
+            renderCurriculum();
+          };
+
+          semDiv.appendChild(div);
         });
 
-        container.appendChild(yearDiv);
-      }
-    }
+      yearDiv.appendChild(semDiv);
+    });
 
-    function resetProgress() {
-      if (confirm('¿Deseas borrar tu progreso?')) {
-        localStorage.removeItem('approved');
-        approved.clear();
-        renderCurriculum();
-      }
-    }
+    container.appendChild(yearDiv);
+  }
+}
 
+function resetProgress() {
+  if (confirm('¿Deseas borrar tu progreso y notas?')) {
+    localStorage.removeItem('approved');
+    localStorage.removeItem('grades');
+    approved.clear();
     renderCurriculum();
+  }
+}
+renderCurriculum();
   </script>
 </body>
 </html>
