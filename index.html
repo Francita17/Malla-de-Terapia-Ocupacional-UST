@@ -2,111 +2,140 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Malla Curricular - Terapia Ocupacional</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f7f9fb;
+      background-color: #e9f5ec; /* verde muy claro */
       margin: 0;
-      padding: 20px;
+      padding: 15px 10px;
+      font-size: 14px; /* tamaño más pequeño */
+      color: #2d3e26;
     }
 
     h1 {
       text-align: center;
-      color: #2c3e50;
-      margin-bottom: 40px;
+      color: #2e7d32; /* verde oscuro */
+      margin-bottom: 30px;
+      font-size: 1.8em;
     }
 
     .curriculum {
       display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 20px;
+      flex-wrap: wrap; /* que pueda bajar filas */
+      gap: 15px;
       justify-content: center;
     }
 
     .year {
-      min-width: 280px;
-      background: #ffffff;
+      min-width: 230px;
+      max-width: 230px;
+      background: #d0e8d0; /* verde claro */
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      padding: 12px 15px;
+      flex-shrink: 0;
+      transition: background-color 0.3s ease;
+    }
+
+    .year:hover {
+      background-color: #b8d8b8;
     }
 
     .year h2 {
       text-align: center;
-      font-size: 1.2em;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
-      color: #2980b9;
+      font-size: 1.15em;
+      border-bottom: 2px solid #4caf50; /* verde vivo */
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      color: #2e7d32;
     }
 
     .semester {
-      margin-bottom: 15px;
+      margin-bottom: 14px;
     }
 
     .semester h3 {
       font-size: 1em;
-      color: #444;
-      margin: 10px 0 6px;
-      border-bottom: 1px solid #ddd;
+      color: #33691e; /* verde más oscuro */
+      margin: 8px 0 6px;
+      border-bottom: 1.5px solid #a5d6a7; /* verde suave */
+      padding-bottom: 4px;
     }
 
     .subject {
-      padding: 8px;
-      margin: 6px 0;
-      background: #ecf0f1;
-      border-left: 5px solid #3498db;
+      padding: 7px 8px;
+      margin: 5px 0;
+      background: #f0faf0; /* fondo verde muy suave */
+      border-left: 5px solid #81c784; /* verde medio */
       border-radius: 5px;
       cursor: pointer;
       position: relative;
-      transition: 0.2s;
-      font-size: 0.95em;
+      transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+      font-size: 0.9em;
+      color: #1b5e20; /* verde oscuro texto */
+      user-select: none;
+    }
+
+    .subject:hover:not(.locked):not(.approved) {
+      background-color: #c8e6c9;
+      border-left-color: #4caf50;
     }
 
     .subject.approved {
-      background: #2ecc71;
+      background: #4caf50; /* verde aprobado */
       color: white;
-      border-color: #27ae60;
+      border-color: #388e3c;
     }
 
     .subject.locked {
-      background: #dcdcdc;
-      color: #999;
+      background: #e0e0e0;
+      color: #9e9e9e;
       cursor: not-allowed;
-      border-color: #bdc3c7;
+      border-color: #bdbdbd;
     }
 
     .subject[title]:hover::after {
       content: attr(title);
       position: absolute;
-      left: 100%;
+      left: 105%;
       top: 0;
-      background: #333;
-      color: #fff;
-      padding: 6px;
+      background: #2e7d32;
+      color: #e8f5e9;
+      padding: 6px 8px;
       border-radius: 5px;
       white-space: pre-wrap;
-      font-size: 0.85em;
+      font-size: 0.75em;
       z-index: 10;
-      max-width: 200px;
+      max-width: 220px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
 
     button {
-      margin: 20px auto;
+      margin: 25px auto 10px;
       display: block;
-      padding: 10px 20px;
-      background: #e74c3c;
+      padding: 10px 22px;
+      background: #388e3c; /* verde botón */
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+      user-select: none;
     }
 
     button:hover {
-      background: #c0392b;
+      background: #2e7d32;
+    }
+
+    /* Para pantallas muy pequeñas, que la malla ocupe el 100% */
+    @media (max-width: 600px) {
+      .year {
+        min-width: 100%;
+        max-width: 100%;
+      }
     }
   </style>
 </head>
@@ -124,160 +153,161 @@
       'Año 5': ['IX', 'X']
     };
 
-const subjects = [
-  { code: 'MAT-016', name: 'Razonamiento Lógico Matemático', semester: 'I', prereq: [] },
-  { code: 'BIO-006', name: 'Principios de la Biología', semester: 'I', prereq: [] },
-  { code: 'COM-001', name: 'Taller de Competencias para el Aprendizaje', semester: 'I', prereq: [] },
-  { code: 'FGL-149', name: 'Taller de Competencias Comunicativas', semester: 'I', prereq: [] },
-  { code: 'TOC-078', name: 'Fundamentos de Terapia Ocupacional', semester: 'I', prereq: [] },
-  { code: 'FGL-151', name: 'Taller de Desarrollo Personal I', semester: 'I', prereq: [] },
-  { code: 'TOC-079', name: 'Anatomía Descriptiva', semester: 'II', prereq: [] },
-  { code: 'TOC-080', name: 'Psicología General y del Desarrollo', semester: 'II', prereq: [] },
-  { code: 'TOC-119', name: 'Ocupación Humana', semester: 'II', prereq: ['TOC-078'] },
-  { code: 'FGL-152', name: 'Taller de Desarrollo Personal II', semester: 'II', prereq: [] },
-  { code: 'FGL-001', name: 'Cultura y Valores', semester: 'II', prereq: [] },
-  { code: 'ENF-150', name: 'Salud y Sociedad', semester: 'II', prereq: [] },
-  { code: 'ENF-151', name: 'Atención Básica de Urgencia', semester: 'II', prereq: [] },
-  { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] },
-  { code: 'TOC-006', name: 'Psicología Social y del Trabajo', semester: 'III', prereq: [] },
-  { code: 'TOC-084', name: 'Fundamentos del Movimiento Humano', semester: 'III', prereq: ['MAT-016'] },
-  { code: 'TOC-085', name: 'Anatomía y Fisiología de Sistemas', semester: 'III', prereq: [] },
-  { code: 'TOC-086', name: 'Introducción a la Salud Mental', semester: 'III', prereq: ['TOC-080'] },
-  { code: 'FGL-008', name: 'Inglés Básico I', semester: 'III', prereq: [] },
-  { code: 'FGL-111', name: 'Persona y Sentido', semester: 'III', prereq: [] },
-  { code: 'TOC-087', name: 'Evaluación de Competencias HITO 1', semester: 'IV', prereq: ['TOC-083'] },
-  { code: 'TOC-088', name: 'Análisis y Adaptación de la Actividad', semester: 'IV', prereq: ['TOC-083'] },
-  { code: 'ENF-152', name: 'Ética y Salud', semester: 'IV', prereq: [] },
-  { code: 'TOC-089', name: 'Psicomotricidad', semester: 'IV', prereq: [] },
-  { code: 'TOC-090', name: 'Patología General', semester: 'IV', prereq: [] },
-  { code: 'TOC-091', name: 'Biomecánica', semester: 'IV', prereq: ['TOC-084'] },
-  { code: 'FGL-010', name: 'Inglés Básico II', semester: 'IV', prereq: ['FGL-008'] },
-  { code: 'TOC-092', name: 'Razonamiento Profesional', semester: 'V', prereq: ['TOC-083'] },
-  { code: 'TOC-057', name: 'Psicomotricidad Aplicada', semester: 'V', prereq: ['TOC-089'] },
-  { code: 'TOC-093', name: 'Gestión y Terapia Ocupacional', semester: 'V', prereq: [] },
-  { code: 'TOC-094', name: 'Salud Mental en Niños y Adolescentes', semester: 'V', prereq: ['TOC-086'] },
-  { code: 'TOC-095', name: 'Neurología en Niños y Adolescentes', semester: 'V', prereq: ['TOC-089'] },
-  { code: 'TOC-096', name: 'Traumatología', semester: 'V', prereq: ['TOC-079'] },
-  { code: 'TOC-EL1', name: 'Electivo I', semester: 'V', prereq: [] },
-  { code: 'TOC-097', name: 'Procesos de Terapia Ocupacional', semester: 'VI', prereq: ['TOC-092'] },
-  { code: 'TOC-098', name: 'Ergonomía y Salud en el Trabajo', semester: 'VI', prereq: ['TOC-088'] },
-  { code: 'TOC-099', name: 'Diagnóstico e Intervención en la Comunidad', semester: 'VI', prereq: [] },
-  { code: 'TOC-100', name: 'Salud Mental Adulto y Mayor', semester: 'VI', prereq: ['TOC-086'] },
-  { code: 'TOC-101', name: 'Neurología Adulto y Mayor', semester: 'VI', prereq: ['TOC-085'] },
-  { code: 'TOC-EL2', name: 'Electivo II', semester: 'VI', prereq: [] },
-  { code: 'TOC-102', name: 'Diagnóstico en Personas Mayores', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'] },
-  { code: 'TOC-103', name: 'Diagnóstico en Adultos', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'] },
-  { code: 'TOC-104', name: 'Diagnóstico en Niños y Adolescentes', semester: 'VII', prereq: ['TOC-094','TOC-097','TOC-095'] },
-  { code: 'TOC-068', name: 'Inclusión Educacional y Laboral', semester: 'VII', prereq: [] },
-  { code: 'TOC-105', name: 'Órtesis y Tecnologías', semester: 'VII', prereq: ['TOC-091','TOC-101','TOC-096'] },
-  { code: 'TOC-106', name: 'Estadística y Epidemiología', semester: 'VII', prereq: ['MAT-016'] },
-  { code: 'TOC-107', name: 'Evaluación de Competencias HITO 2', semester: 'VIII', prereq: ['TOC-102','TOC-103','TOC-104'] },
-  { code: 'TOC-108', name: 'Intervención en Personas Mayores', semester: 'VIII', prereq: ['TOC-102'] },
-  { code: 'TOC-109', name: 'Intervención en Adultos', semester: 'VIII', prereq: ['TOC-103'] },
-  { code: 'TOC-110', name: 'Intervención en Niños y Adolescentes', semester: 'VIII', prereq: ['TOC-104'] },
-  { code: 'TOC-111', name: 'Órtesis', semester: 'VIII', prereq: ['TOC-105'] },
-  { code: 'TOC-EL3', name: 'Electivo III', semester: 'VIII', prereq: [] },
-  { code: 'TOC-113', name: 'Metodología y Diseño de Investigación', semester: 'VIII', prereq: ['TOC-106'] },
-  { code: 'TOC-114', name: 'Internado Profesional I', semester: 'IX', prereq: [] },
-  { code: 'TOC-115', name: 'Internado Profesional II', semester: 'IX', prereq: ['TOC-107'] },
-  { code: 'TOC-116', name: 'Seminario de Investigación', semester: 'IX', prereq: ['TOC-113'] },
-  { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107'] },
-  { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: [] }
-];
-const approved = new Set(JSON.parse(localStorage.getItem('approved') || '[]'));
-const grades = JSON.parse(localStorage.getItem('grades') || '{}');
+    const subjects = [
+      { code: 'MAT-016', name: 'Razonamiento Lógico Matemático', semester: 'I', prereq: [] },
+      { code: 'BIO-006', name: 'Principios de la Biología', semester: 'I', prereq: [] },
+      { code: 'COM-001', name: 'Taller de Competencias para el Aprendizaje', semester: 'I', prereq: [] },
+      { code: 'FGL-149', name: 'Taller de Competencias Comunicativas', semester: 'I', prereq: [] },
+      { code: 'TOC-078', name: 'Fundamentos de Terapia Ocupacional', semester: 'I', prereq: [] },
+      { code: 'FGL-151', name: 'Taller de Desarrollo Personal I', semester: 'I', prereq: [] },
+      { code: 'TOC-079', name: 'Anatomía Descriptiva', semester: 'II', prereq: [] },
+      { code: 'TOC-080', name: 'Psicología General y del Desarrollo', semester: 'II', prereq: [] },
+      { code: 'TOC-119', name: 'Ocupación Humana', semester: 'II', prereq: ['TOC-078'] },
+      { code: 'FGL-152', name: 'Taller de Desarrollo Personal II', semester: 'II', prereq: [] },
+      { code: 'FGL-001', name: 'Cultura y Valores', semester: 'II', prereq: [] },
+      { code: 'ENF-150', name: 'Salud y Sociedad', semester: 'II', prereq: [] },
+      { code: 'ENF-151', name: 'Atención Básica de Urgencia', semester: 'II', prereq: [] },
+      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] },
+      { code: 'TOC-006', name: 'Psicología Social y del Trabajo', semester: 'III', prereq: [] },
+      { code: 'TOC-084', name: 'Fundamentos del Movimiento Humano', semester: 'III', prereq: ['MAT-016'] },
+      { code: 'TOC-085', name: 'Anatomía y Fisiología de Sistemas', semester: 'III', prereq: [] },
+      { code: 'TOC-086', name: 'Introducción a la Salud Mental', semester: 'III', prereq: ['TOC-080'] },
+      { code: 'FGL-008', name: 'Inglés Básico I', semester: 'III', prereq: [] },
+      { code: 'FGL-111', name: 'Persona y Sentido', semester: 'III', prereq: [] },
+      { code: 'TOC-087', name: 'Evaluación de Competencias HITO 1', semester: 'IV', prereq: ['TOC-083'] },
+      { code: 'TOC-088', name: 'Análisis y Adaptación de la Actividad', semester: 'IV', prereq: ['TOC-083'] },
+      { code: 'ENF-152', name: 'Ética y Salud', semester: 'IV', prereq: [] },
+      { code: 'TOC-089', name: 'Psicomotricidad', semester: 'IV', prereq: [] },
+      { code: 'TOC-090', name: 'Patología General', semester: 'IV', prereq: [] },
+      { code: 'TOC-091', name: 'Biomecánica', semester: 'IV', prereq: ['TOC-084'] },
+      { code: 'FGL-010', name: 'Inglés Básico II', semester: 'IV', prereq: ['FGL-008'] },
+      { code: 'TOC-092', name: 'Razonamiento Profesional', semester: 'V', prereq: ['TOC-083'] },
+      { code: 'TOC-057', name: 'Psicomotricidad Aplicada', semester: 'V', prereq: ['TOC-089'] },
+      { code: 'TOC-093', name: 'Gestión y Terapia Ocupacional', semester: 'V', prereq: [] },
+      { code: 'TOC-094', name: 'Salud Mental en Niños y Adolescentes', semester: 'V', prereq: ['TOC-086'] },
+      { code: 'TOC-095', name: 'Neurología en Niños y Adolescentes', semester: 'V', prereq: ['TOC-089'] },
+      { code: 'TOC-096', name: 'Traumatología', semester: 'V', prereq: ['TOC-079'] },
+      { code: 'TOC-EL1', name: 'Electivo I', semester: 'V', prereq: [] },
+      { code: 'TOC-097', name: 'Procesos de Terapia Ocupacional', semester: 'VI', prereq: ['TOC-092'] },
+      { code: 'TOC-098', name: 'Ergonomía y Salud en el Trabajo', semester: 'VI', prereq: ['TOC-088'] },
+      { code: 'TOC-099', name: 'Diagnóstico e Intervención en la Comunidad', semester: 'VI', prereq: [] },
+      { code: 'TOC-100', name: 'Salud Mental Adulto y Mayor', semester: 'VI', prereq: ['TOC-086'] },
+      { code: 'TOC-101', name: 'Neurología Adulto y Mayor', semester: 'VI', prereq: ['TOC-085'] },
+      { code: 'TOC-EL2', name: 'Electivo II', semester: 'VI', prereq: [] },
+      { code: 'TOC-102', name: 'Diagnóstico en Personas Mayores', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'] },
+      { code: 'TOC-103', name: 'Diagnóstico en Adultos', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'] },
+      { code: 'TOC-104', name: 'Diagnóstico en Niños y Adolescentes', semester: 'VII', prereq: ['TOC-094','TOC-097','TOC-095'] },
+      { code: 'TOC-068', name: 'Inclusión Educacional y Laboral', semester: 'VII', prereq: [] },
+      { code: 'TOC-105', name: 'Órtesis y Tecnologías', semester: 'VII', prereq: ['TOC-091','TOC-101','TOC-096'] },
+      { code: 'TOC-106', name: 'Estadística y Epidemiología', semester: 'VII', prereq: ['MAT-016'] },
+      { code: 'TOC-107', name: 'Evaluación de Competencias HITO 2', semester: 'VIII', prereq: ['TOC-102','TOC-103','TOC-104'] },
+      { code: 'TOC-108', name: 'Intervención en Personas Mayores', semester: 'VIII', prereq: ['TOC-102'] },
+      { code: 'TOC-109', name: 'Intervención en Adultos', semester: 'VIII', prereq: ['TOC-103'] },
+      { code: 'TOC-110', name: 'Intervención en Niños y Adolescentes', semester: 'VIII', prereq: ['TOC-104'] },
+      { code: 'TOC-111', name: 'Órtesis', semester: 'VIII', prereq: ['TOC-105'] },
+      { code: 'TOC-EL3', name: 'Electivo III', semester: 'VIII', prereq: [] },
+      { code: 'TOC-113', name: 'Metodología y Diseño de Investigación', semester: 'VIII', prereq: ['TOC-106'] },
+      { code: 'TOC-114', name: 'Internado Profesional I', semester: 'IX', prereq: [] },
+      { code: 'TOC-115', name: 'Internado Profesional II', semester: 'IX', prereq: ['TOC-107'] },
+      { code: 'TOC-116', name: 'Seminario de Investigación', semester: 'IX', prereq: ['TOC-113'] },
+      { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107'] },
+      { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: [] }
+    ];
 
-function isApproved(code) {
-  return approved.has(code);
-}
+    const approved = new Set(JSON.parse(localStorage.getItem('approved') || '[]'));
+    const grades = JSON.parse(localStorage.getItem('grades') || '{}');
 
-function meetsPrerequisites(subject) {
-  return subject.prereq.every(code => approved.has(code));
-}
+    function isApproved(code) {
+      return approved.has(code);
+    }
 
-function renderCurriculum() {
-  const container = document.getElementById('curriculum');
-  container.innerHTML = '';
+    function meetsPrerequisites(subject) {
+      return subject.prereq.every(code => approved.has(code));
+    }
 
-  for (const [yearLabel, semesters] of Object.entries(curriculum)) {
-    const yearDiv = document.createElement('div');
-    yearDiv.className = 'year';
-    yearDiv.innerHTML = `<h2>${yearLabel}</h2>`;
+    function renderCurriculum() {
+      const container = document.getElementById('curriculum');
+      container.innerHTML = '';
 
-    semesters.forEach(sem => {
-      const semDiv = document.createElement('div');
-      semDiv.className = 'semester';
-      semDiv.innerHTML = `<h3>Semestre ${sem}</h3>`;
+      for (const [yearLabel, semesters] of Object.entries(curriculum)) {
+        const yearDiv = document.createElement('div');
+        yearDiv.className = 'year';
+        yearDiv.innerHTML = `<h2>${yearLabel}</h2>`;
 
-      subjects
-        .filter(s => s.semester === sem)
-        .forEach(subject => {
-          const div = document.createElement('div');
-          const unlocked = meetsPrerequisites(subject);
-          div.className = 'subject';
+        semesters.forEach(sem => {
+          const semDiv = document.createElement('div');
+          semDiv.className = 'semester';
+          semDiv.innerHTML = `<h3>Semestre ${sem}</h3>`;
 
-          const gradeText = grades[subject.code] ? ` (${grades[subject.code]})` : '';
-          div.textContent = subject.name + gradeText;
+          subjects
+            .filter(s => s.semester === sem)
+            .forEach(subject => {
+              const div = document.createElement('div');
+              const unlocked = meetsPrerequisites(subject);
+              div.className = 'subject';
 
-          if (isApproved(subject.code)) {
-            div.classList.add('approved');
-          } else if (!unlocked) {
-            div.classList.add('locked');
-            const names = subject.prereq.map(p => {
-              const found = subjects.find(s => s.code === p);
-              return found ? found.name : p;
+              const gradeText = grades[subject.code] ? ` (${grades[subject.code]})` : '';
+              div.textContent = subject.name + gradeText;
+
+              if (isApproved(subject.code)) {
+                div.classList.add('approved');
+              } else if (!unlocked) {
+                div.classList.add('locked');
+                const names = subject.prereq.map(p => {
+                  const found = subjects.find(s => s.code === p);
+                  return found ? found.name : p;
+                });
+                div.title = 'Requiere: ' + names.join(', ');
+              }
+
+              div.onclick = () => {
+                if (!unlocked) return;
+
+                if (approved.has(subject.code)) {
+                  // Si ya está aprobada: quitar aprobación y nota
+                  approved.delete(subject.code);
+                  delete grades[subject.code];
+                } else {
+                  // Pedir nota
+                  let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
+                  if (nota === null || nota.trim() === '') return; // Cancelado
+                  nota = nota.replace(',', '.');
+                  const parsed = parseFloat(nota);
+                  if (isNaN(parsed) || parsed < 4.0) {
+                    alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
+                    return;
+                  }
+
+                  // Aprobar y guardar nota
+                  approved.add(subject.code);
+                  grades[subject.code] = parsed.toFixed(1);
+                }
+                // Guardar en localStorage
+                localStorage.setItem('approved', JSON.stringify([...approved]));
+                localStorage.setItem('grades', JSON.stringify(grades));
+                renderCurriculum();
+              };
+
+              semDiv.appendChild(div);
             });
-            div.title = 'Requiere: ' + names.join(', ');
-          }
 
-          div.onclick = () => {
-            if (!unlocked) return;
-
-            if (approved.has(subject.code)) {
-              // Si ya está aprobada: quitar aprobación y nota
-              approved.delete(subject.code);
-              delete grades[subject.code];
-            } else {
-              // Pedir nota
-              approved.add(subject.code);
-              let nota = prompt(`Ingresa la nota final de "${subject.name}" (mínimo 4.0 para aprobar):`);
-              if (nota === null || nota.trim() === '') return; // Cancelado
-                nota = nota.replace(',', '.');
-                const parsed = parseFloat(nota);
-               if (isNaN(parsed) || parsed < 4.0) {
-               alert('La nota debe ser numérica y mayor o igual a 4.0 para aprobar.');
-               return;
-           }
-
-    // Aprobar y guardar nota
-    approved.add(subject.code);
-    grades[subject.code] = parsed.toFixed(1);
-  }
-            // Guardar en localStorage
-            localStorage.setItem('approved', JSON.stringify([...approved]));
-            localStorage.setItem('grades', JSON.stringify(grades));
-            renderCurriculum();
-          };
-
-          semDiv.appendChild(div);
+          yearDiv.appendChild(semDiv);
         });
 
-      yearDiv.appendChild(semDiv);
-    });
+        container.appendChild(yearDiv);
+      }
+    }
 
-    container.appendChild(yearDiv);
-  }
-}
+    function resetProgress() {
+      if (confirm('¿Deseas borrar tu progreso y notas?')) {
+        localStorage.removeItem('approved');
+        localStorage.removeItem('grades');
+        approved.clear();
+        renderCurriculum();
+      }
+    }
 
-function resetProgress() {
-  if (confirm('¿Deseas borrar tu progreso y notas?')) {
-    localStorage.removeItem('approved');
-    localStorage.removeItem('grades');
-    approved.clear();
     renderCurriculum();
-  }
-}
-renderCurriculum();
   </script>
 </body>
 </html>
