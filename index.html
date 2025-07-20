@@ -137,6 +137,22 @@
     button:hover {
       background: #2e7d32;
     }
+    #global-grade {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #2e7d32;
+      margin-bottom: 20px;
+      text-align: center;
+      padding: 10px 0;
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      background-color: #dcedc8;
+      box-shadow: 0 2px 6px rgba(46, 125, 50, 0.4);
+      user-select: none;
+      max-width: 350px;
+      margin-left: auto;
+      margin-right: auto;
+    }
     @media (max-width: 600px) {
       .year {
         min-width: 100%;
@@ -147,6 +163,9 @@
 </head>
 <body>
   <img src="Banner.png" alt="Malla Curricular - Terapia Ocupacional" style="display: block; margin: 0 auto 30px; max-width: 100%; height: auto;" />
+  
+  <div id="global-grade">Nota Global Ponderada: 0.00</div>
+  
   <div class="progress-container">
     <div>Progreso académico: <span id="progress-text">0%</span></div>
     <div class="progress-bar">
@@ -166,64 +185,64 @@
     };
 
     const subjects = [
-      { code: 'MAT-016', name: 'Razonamiento Lógico Matemático', semester: 'I', prereq: [] },
-      { code: 'BIO-006', name: 'Principios de la Biología', semester: 'I', prereq: [] },
-      { code: 'COM-001', name: 'Taller de Competencias para el Aprendizaje', semester: 'I', prereq: [] },
-      { code: 'FGL-149', name: 'Taller de Competencias Comunicativas', semester: 'I', prereq: [] },
-      { code: 'TOC-078', name: 'Fundamentos de Terapia Ocupacional', semester: 'I', prereq: [] },
-      { code: 'FGL-151', name: 'Taller de Desarrollo Personal I', semester: 'I', prereq: [] },
-      { code: 'TOC-079', name: 'Anatomía Descriptiva', semester: 'II', prereq: [] },
-      { code: 'TOC-080', name: 'Psicología General y del Desarrollo', semester: 'II', prereq: [] },
-      { code: 'TOC-119', name: 'Ocupación Humana', semester: 'II', prereq: ['TOC-078'] },
-      { code: 'FGL-152', name: 'Taller de Desarrollo Personal II', semester: 'II', prereq: [] },
-      { code: 'FGL-001', name: 'Cultura y Valores', semester: 'II', prereq: [] },
-      { code: 'ENF-150', name: 'Salud y Sociedad', semester: 'II', prereq: [] },
-      { code: 'ENF-151', name: 'Atención Básica de Urgencia', semester: 'II', prereq: [] },
-      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'] },
-      { code: 'TOC-006', name: 'Psicología Social y del Trabajo', semester: 'III', prereq: [] },
-      { code: 'TOC-084', name: 'Fundamentos del Movimiento Humano', semester: 'III', prereq: ['MAT-016'] },
-      { code: 'TOC-085', name: 'Anatomía y Fisiología de Sistemas', semester: 'III', prereq: [] },
-      { code: 'TOC-086', name: 'Introducción a la Salud Mental', semester: 'III', prereq: ['TOC-080'] },
-      { code: 'FGL-008', name: 'Inglés Básico I', semester: 'III', prereq: [] },
-      { code: 'FGL-111', name: 'Persona y Sentido', semester: 'III', prereq: [] },
-      { code: 'TOC-087', name: 'Evaluación de Competencias HITO 1', semester: 'IV', prereq: ['TOC-083'] },
-      { code: 'TOC-088', name: 'Análisis y Adaptación de la Actividad', semester: 'IV', prereq: ['TOC-083'] },
-      { code: 'ENF-152', name: 'Ética y Salud', semester: 'IV', prereq: [] },
-      { code: 'TOC-089', name: 'Psicomotricidad', semester: 'IV', prereq: [] },
-      { code: 'TOC-090', name: 'Patología General', semester: 'IV', prereq: [] },
-      { code: 'TOC-091', name: 'Biomecánica', semester: 'IV', prereq: ['TOC-084'] },
-      { code: 'FGL-010', name: 'Inglés Básico II', semester: 'IV', prereq: ['FGL-008'] },
-      { code: 'TOC-092', name: 'Razonamiento Profesional', semester: 'V', prereq: ['TOC-083'] },
-      { code: 'TOC-057', name: 'Psicomotricidad Aplicada', semester: 'V', prereq: ['TOC-089'] },
-      { code: 'TOC-093', name: 'Gestión y Terapia Ocupacional', semester: 'V', prereq: [] },
-      { code: 'TOC-094', name: 'Salud Mental en Niños y Adolescentes', semester: 'V', prereq: ['TOC-086'] },
-      { code: 'TOC-095', name: 'Neurología en Niños y Adolescentes', semester: 'V', prereq: ['TOC-089'] },
-      { code: 'TOC-096', name: 'Traumatología', semester: 'V', prereq: ['TOC-079'] },
-      { code: 'TOC-EL1', name: 'Electivo I', semester: 'V', prereq: [] },
-      { code: 'TOC-097', name: 'Procesos de Terapia Ocupacional', semester: 'VI', prereq: ['TOC-092'] },
-      { code: 'TOC-098', name: 'Ergonomía y Salud en el Trabajo', semester: 'VI', prereq: ['TOC-088'] },
-      { code: 'TOC-099', name: 'Diagnóstico e Intervención en la Comunidad', semester: 'VI', prereq: [] },
-      { code: 'TOC-100', name: 'Salud Mental Adulto y Mayor', semester: 'VI', prereq: ['TOC-086'] },
-      { code: 'TOC-101', name: 'Neurología Adulto y Mayor', semester: 'VI', prereq: ['TOC-085'] },
-      { code: 'TOC-EL2', name: 'Electivo II', semester: 'VI', prereq: [] },
-      { code: 'TOC-102', name: 'Diagnóstico en Personas Mayores', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'] },
-      { code: 'TOC-103', name: 'Diagnóstico en Adultos', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'] },
-      { code: 'TOC-104', name: 'Diagnóstico en Niños y Adolescentes', semester: 'VII', prereq: ['TOC-094','TOC-097','TOC-095'] },
-      { code: 'TOC-068', name: 'Inclusión Educacional y Laboral', semester: 'VII', prereq: [] },
-      { code: 'TOC-105', name: 'Órtesis y Tecnologías', semester: 'VII', prereq: ['TOC-091','TOC-101','TOC-096'] },
-      { code: 'TOC-106', name: 'Estadística y Epidemiología', semester: 'VII', prereq: ['MAT-016'] },
-      { code: 'TOC-107', name: 'Evaluación de Competencias HITO 2', semester: 'VIII', prereq: ['TOC-102','TOC-103','TOC-104'] },
-      { code: 'TOC-108', name: 'Intervención en Personas Mayores', semester: 'VIII', prereq: ['TOC-102'] },
-      { code: 'TOC-109', name: 'Intervención en Adultos', semester: 'VIII', prereq: ['TOC-103'] },
-      { code: 'TOC-110', name: 'Intervención en Niños y Adolescentes', semester: 'VIII', prereq: ['TOC-104'] },
-      { code: 'TOC-111', name: 'Órtesis', semester: 'VIII', prereq: ['TOC-105'] },
-      { code: 'TOC-EL3', name: 'Electivo III', semester: 'VIII', prereq: [] },
-      { code: 'TOC-113', name: 'Metodología y Diseño de Investigación', semester: 'VIII', prereq: ['TOC-106'] },
-      { code: 'TOC-114', name: 'Internado Profesional I', semester: 'IX', prereq: ['TOC-107'] },
-      { code: 'TOC-115', name: 'Internado Profesional II', semester: 'IX', prereq: ['TOC-107','TOC-114'] },
-      { code: 'TOC-116', name: 'Seminario de Investigación', semester: 'IX', prereq: ['TOC-113'] },
-      { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107','TOC-115'] },
-      { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: ['TOC-107','TOC-117'] }
+      { code: 'MAT-016', name: 'Razonamiento Lógico Matemático', semester: 'I', prereq: [], credits: 6 },
+      { code: 'BIO-006', name: 'Principios de la Biología', semester: 'I', prereq: [], credits: 6 },
+      { code: 'COM-001', name: 'Taller de Competencias para el Aprendizaje', semester: 'I', prereq: [], credits: 5 },
+      { code: 'FGL-149', name: 'Taller de Competencias Comunicativas', semester: 'I', prereq: [], credits: 4 },
+      { code: 'TOC-078', name: 'Fundamentos de Terapia Ocupacional', semester: 'I', prereq: [], credits: 2 },
+      { code: 'FGL-151', name: 'Taller de Desarrollo Personal I', semester: 'I', prereq: [], credits: 2 },
+      { code: 'TOC-079', name: 'Anatomía Descriptiva', semester: 'II', prereq: [], credits: 7 },
+      { code: 'TOC-080', name: 'Psicología General y del Desarrollo', semester: 'II', prereq: [], credits: 6 },
+      { code: 'TOC-119', name: 'Ocupación Humana', semester: 'II', prereq: ['TOC-078'], credits: 6 },
+      { code: 'FGL-152', name: 'Taller de Desarrollo Personal II', semester: 'II', prereq: [], credits: 2 },
+      { code: 'FGL-001', name: 'Cultura y Valores', semester: 'II', prereq: [], credits: 4 },
+      { code: 'ENF-150', name: 'Salud y Sociedad', semester: 'II', prereq: [], credits: 3 },
+      { code: 'ENF-151', name: 'Atención Básica de Urgencia', semester: 'II', prereq: [], credits: 2 },
+      { code: 'TOC-083', name: 'Desempeño y Participación Ocupacional', semester: 'III', prereq: ['TOC-119'], credits: 5 },
+      { code: 'TOC-006', name: 'Psicología Social y del Trabajo', semester: 'III', prereq: [], credits: 4 },
+      { code: 'TOC-084', name: 'Fundamentos del Movimiento Humano', semester: 'III', prereq: ['MAT-016'], credits: 3 },
+      { code: 'TOC-085', name: 'Anatomía y Fisiología de Sistemas', semester: 'III', prereq: [], credits: 8 },
+      { code: 'TOC-086', name: 'Introducción a la Salud Mental', semester: 'III', prereq: ['TOC-080'], credits: 3 },
+      { code: 'FGL-008', name: 'Inglés Básico I', semester: 'III', prereq: [], credits: 4 },
+      { code: 'FGL-111', name: 'Persona y Sentido', semester: 'III', prereq: [], credits: 4 },
+      { code: 'TOC-087', name: 'Evaluación de Competencias HITO 1', semester: 'IV', prereq: ['TOC-083'], credits: 2 },
+      { code: 'TOC-088', name: 'Análisis y Adaptación de la Actividad', semester: 'IV', prereq: ['TOC-083'], credits: 5 },
+      { code: 'ENF-152', name: 'Ética y Salud', semester: 'IV', prereq: [], credits: 3 },
+      { code: 'TOC-089', name: 'Psicomotricidad', semester: 'IV', prereq: [], credits: 5 },
+      { code: 'TOC-090', name: 'Patología General', semester: 'IV', prereq: [], credits: 4 },
+      { code: 'TOC-091', name: 'Biomecánica', semester: 'IV', prereq: ['TOC-084'], credits: 5 },
+      { code: 'FGL-010', name: 'Inglés Básico II', semester: 'IV', prereq: ['FGL-008'], credits: 4 },
+      { code: 'TOC-092', name: 'Razonamiento Profesional', semester: 'V', prereq: ['TOC-083'], credits: 3 },
+      { code: 'TOC-057', name: 'Psicomotricidad Aplicada', semester: 'V', prereq: ['TOC-089'], credits: 5 },
+      { code: 'TOC-093', name: 'Gestión y Terapia Ocupacional', semester: 'V', prereq: [], credits: 4 },
+      { code: 'TOC-094', name: 'Salud Mental en Niños y Adolescentes', semester: 'V', prereq: ['TOC-086'], credits: 5 },
+      { code: 'TOC-095', name: 'Neurología en Niños y Adolescentes', semester: 'V', prereq: ['TOC-089'], credits: 5 },
+      { code: 'TOC-096', name: 'Traumatología', semester: 'V', prereq: ['TOC-079'], credits: 5 },
+      { code: 'TOC-EL1', name: 'Electivo I', semester: 'V', prereq: [], credits: 4 },
+      { code: 'TOC-097', name: 'Procesos de Terapia Ocupacional', semester: 'VI', prereq: ['TOC-092'], credits: 4 },
+      { code: 'TOC-098', name: 'Ergonomía y Salud en el Trabajo', semester: 'VI', prereq: ['TOC-088'], credits: 4 },
+      { code: 'TOC-099', name: 'Diagnóstico e Intervención en la Comunidad', semester: 'VI', prereq: [], credits: 6 },
+      { code: 'TOC-100', name: 'Salud Mental Adulto y Mayor', semester: 'VI', prereq: ['TOC-086'], credits: 5 },
+      { code: 'TOC-101', name: 'Neurología Adulto y Mayor', semester: 'VI', prereq: ['TOC-085'], credits: 6 },
+      { code: 'TOC-EL2', name: 'Electivo II', semester: 'VI', prereq: [], credits: 4 },
+      { code: 'TOC-102', name: 'Diagnóstico en Personas Mayores', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'], credits: 4 },
+      { code: 'TOC-103', name: 'Diagnóstico en Adultos', semester: 'VII', prereq: ['TOC-101','TOC-100','TOC-097'], credits: 7 },
+      { code: 'TOC-104', name: 'Diagnóstico en Niños y Adolescentes', semester: 'VII', prereq: ['TOC-094','TOC-097','TOC-095'], credits: 5 },
+      { code: 'TOC-068', name: 'Inclusión Educacional y Laboral', semester: 'VII', prereq: [], credits: 5 },
+      { code: 'TOC-105', name: 'Órtesis y Tecnologías', semester: 'VII', prereq: ['TOC-091','TOC-101','TOC-096'], credits: 5 },
+      { code: 'TOC-106', name: 'Estadística y Epidemiología', semester: 'VII', prereq: ['MAT-016'], credits: 5 },
+      { code: 'TOC-107', name: 'Evaluación de Competencias HITO 2', semester: 'VIII', prereq: ['TOC-102','TOC-103','TOC-104'], credits: 2 },
+      { code: 'TOC-108', name: 'Intervención en Personas Mayores', semester: 'VIII', prereq: ['TOC-102'], credits: 4 },
+      { code: 'TOC-109', name: 'Intervención en Adultos', semester: 'VIII', prereq: ['TOC-103'], credits: 6 },
+      { code: 'TOC-110', name: 'Intervención en Niños y Adolescentes', semester: 'VIII', prereq: ['TOC-104'], credits: 5 },
+      { code: 'TOC-111', name: 'Órtesis', semester: 'VIII', prereq: ['TOC-105'], credits: 4 },
+      { code: 'TOC-EL3', name: 'Electivo III', semester: 'VIII', prereq: [], credits: 4 },
+      { code: 'TOC-113', name: 'Metodología y Diseño de Investigación', semester: 'VIII', prereq: ['TOC-106'], credits: 4 },
+      { code: 'TOC-114', name: 'Internado Profesional I', semester: 'IX', prereq: ['TOC-107'], credits: 13 },
+      { code: 'TOC-115', name: 'Internado Profesional II', semester: 'IX', prereq: ['TOC-107','TOC-114'], credits: 13 },
+      { code: 'TOC-116', name: 'Seminario de Investigación', semester: 'IX', prereq: ['TOC-113'], credits: 6 },
+      { code: 'TOC-117', name: 'Internado Profesional III', semester: 'X', prereq: ['TOC-107','TOC-115'], credits: 14 },
+      { code: 'TOC-118', name: 'Internado Profesional IV', semester: 'X', prereq: ['TOC-107','TOC-117'], credits: 14 }
     ];
 
     const approved = new Set(JSON.parse(localStorage.getItem('approved') || '[]'));
@@ -338,6 +357,7 @@
                 localStorage.setItem('grades', JSON.stringify(grades));
                 renderCurriculum();
                 updateProgress();
+                updateGlobalGrade();
               };
 
               semDiv.appendChild(div);
@@ -363,6 +383,30 @@
       progressText.textContent = percent + '%';
     }
 
+    function updateGlobalGrade() {
+      let totalCredits = 0;
+      let weightedSum = 0;
+
+      for (const code of approved) {
+        const subject = subjects.find(s => s.code === code);
+        if (!subject) continue;
+
+        const grade = grades[code];
+        if (!grade) continue;
+
+        if (grade === 'APR') continue; // No considerar hitos para la nota numérica
+
+        const numericGrade = parseFloat(grade);
+        if (isNaN(numericGrade)) continue;
+
+        totalCredits += subject.credits;
+        weightedSum += numericGrade * subject.credits;
+      }
+
+      const globalGrade = totalCredits > 0 ? (weightedSum / totalCredits) : 0;
+      document.getElementById('global-grade').textContent = 'Nota Global Ponderada: ' + globalGrade.toFixed(2);
+    }
+
     function resetProgress() {
       if (confirm('¿Quieres reiniciar el progreso? Se eliminarán todas las asignaturas aprobadas y notas.')) {
         approved.clear();
@@ -373,12 +417,14 @@
         localStorage.removeItem('grades');
         renderCurriculum();
         updateProgress();
+        updateGlobalGrade();
       }
     }
 
     // Render inicial
     renderCurriculum();
     updateProgress();
+    updateGlobalGrade();
   </script>
 </body>
 </html>
